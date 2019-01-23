@@ -45,7 +45,7 @@ function Message(event, conversation) {
         if(item['type'][0] === "PLUS_PHOTO") {
           attachments.push({
             type: "image",
-            url:  item['embeds.PlusPhoto.plus_photo']['url']
+            url:  item['plus_photo']['url']
           });
         }
       });
@@ -198,8 +198,8 @@ Message.prototype.toXml = function() {
 };
 
 function Conversation(conversation_state, list) {
-  let data = conversation_state;
-  let conversation = conversation_state['conversation'];
+  let data = conversation_state['conversation'];
+  let conversation = conversation_state['conversation']['conversation'];
   this.hangouts = list;
   this.id = data['conversation_id']['id'];
   this.participants = conversation['participant_data'].map(function(participant_data) {
@@ -217,7 +217,7 @@ function Conversation(conversation_state, list) {
   });
   var messages = [];
   let thisConvo = this;
-  conversation_state['event'].forEach(function(event) {
+  conversation_state['events'].forEach(function(event) {
     var message = new Message(event, thisConvo);
     if(message) {
       messages.push(message);
@@ -287,8 +287,8 @@ Conversation.prototype.getName = function() {
 function Hangouts(data) {
   var conversations = [];
   var thisList = this;
-  data['conversation_state'].forEach(function(conversation) {
-    conversations.push(new Conversation(conversation['conversation_state'], thisList));
+  data['conversations'].forEach(function(conversation) {
+    conversations.push(new Conversation(conversation, thisList));
   });
   this.conversations = conversations;
   function getUserId() {
